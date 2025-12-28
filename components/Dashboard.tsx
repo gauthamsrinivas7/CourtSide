@@ -1,39 +1,31 @@
-import React, { useState } from 'react';
-import { UserPreferences, GamePreview, GameSummary } from '../types';
-import { generateMorningPreview, generateEveningSummary } from '../services/geminiService';
+import React from 'react';
+import { UserPreferences, GamePreview, GameSummary, View } from '../types';
 import EmailView from './EmailView';
 
 interface DashboardProps {
   preferences: UserPreferences;
   onManage: () => void;
+  activeView: View;
+  setActiveView: (view: View) => void;
+  loading: boolean;
+  previewData: GamePreview[] | null;
+  summaryData: GameSummary[] | null;
+  onFetchPreview: () => void;
+  onFetchSummary: () => void;
 }
 
-enum View {
-  PREVIEW = 'PREVIEW',
-  SUMMARY = 'SUMMARY'
-}
-
-const Dashboard: React.FC<DashboardProps> = ({ preferences, onManage }) => {
-  const [activeView, setActiveView] = useState<View>(View.PREVIEW);
-  const [loading, setLoading] = useState(false);
-  const [previewData, setPreviewData] = useState<GamePreview[] | null>(null);
-  const [summaryData, setSummaryData] = useState<GameSummary[] | null>(null);
-
+const Dashboard: React.FC<DashboardProps> = ({ 
+  preferences, 
+  onManage,
+  activeView,
+  setActiveView,
+  loading,
+  previewData,
+  summaryData,
+  onFetchPreview,
+  onFetchSummary
+}) => {
   const todayStr = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
-
-  const handleFetchPreview = async () => {
-    setLoading(true);
-    const data = await generateMorningPreview(preferences.teams, preferences.timezone);
-    setPreviewData(data);
-    setLoading(false);
-  };
-
-  const handleFetchSummary = async () => {
-    setLoading(true);
-    const data = await generateEveningSummary(preferences.teams);
-    setSummaryData(data);
-    setLoading(false);
-  };
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-200">
@@ -106,7 +98,7 @@ const Dashboard: React.FC<DashboardProps> = ({ preferences, onManage }) => {
                     <h3 className="text-2xl font-bold text-white mb-2">Ready for the day?</h3>
                     <p className="text-slate-400 mb-8">Generate your personalized daily digest to see upcoming games for your {preferences.teams.length} favorite teams.</p>
                     <button 
-                      onClick={handleFetchPreview}
+                      onClick={onFetchPreview}
                       className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-semibold shadow-lg shadow-blue-900/20 transition-all transform hover:-translate-y-1"
                     >
                       Generate 6:00 AM Email
@@ -183,7 +175,7 @@ const Dashboard: React.FC<DashboardProps> = ({ preferences, onManage }) => {
                     <h3 className="text-2xl font-bold text-white mb-2">The Final Whistle</h3>
                     <p className="text-slate-400 mb-8">Wrap up your day with scores and highlights from today's action involving your favorites.</p>
                     <button 
-                      onClick={handleFetchSummary}
+                      onClick={onFetchSummary}
                       className="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full font-semibold shadow-lg shadow-emerald-900/20 transition-all transform hover:-translate-y-1"
                     >
                       Generate 10:00 PM Email

@@ -31,3 +31,8 @@ export interface SummaryResponse {
   results: GameSummary[];
   date: string;
 }
+
+export enum View {
+  PREVIEW = 'PREVIEW',
+  SUMMARY = 'SUMMARY'
+}
